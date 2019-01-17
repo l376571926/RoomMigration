@@ -12,6 +12,7 @@ import group.tonight.roommigrationdemo.dao.DogDao;
 import group.tonight.roommigrationdemo.dao.WordDao;
 import group.tonight.roommigrationdemo.model.Cat;
 import group.tonight.roommigrationdemo.model.Dog;
+import group.tonight.roommigrationdemo.model.Pig;
 import group.tonight.roommigrationdemo.model.Word;
 
 /**
@@ -26,12 +27,13 @@ import group.tonight.roommigrationdemo.model.Word;
         entities = {
                 Word.class
                 , Dog.class
+                , Pig.class
         }
         //如果表结构改了（删除、添加表，删除添加表字段），未修改version，会抛这个异常
         //java.lang.IllegalStateException: Room cannot verify the data integrity.
         // Looks like you've changed schema but forgot to update the version number.
         // You can simply fix this by increasing the version number.
-        , version = 5
+        , version = 6
 )
 public abstract class AppDatabase extends RoomDatabase {
     public abstract WordDao wordDao();
@@ -51,10 +53,24 @@ public abstract class AppDatabase extends RoomDatabase {
                              * Please provide the necessary Migration path via RoomDatabase.Builder.addMigration(Migration ...)
                              * or allow for destructive migrations via one of the RoomDatabase.Builder.fallbackToDestructiveMigration* methods.
                              */
-                            .addMigrations(MIGRATION_1_2)
-                            .addMigrations(MIGRATION_2_3)
-                            .addMigrations(MIGRATION_3_4)
-                            .addMigrations(MIGRATION_4_5)
+//                            .addMigrations(MIGRATION_1_2)
+//                            .addMigrations(MIGRATION_2_3)
+//                            .addMigrations(MIGRATION_3_4)
+//                            .addMigrations(MIGRATION_4_5)
+                            .fallbackToDestructiveMigration()
+                            .addCallback(new Callback() {
+                                @Override
+                                public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                                    super.onCreate(db);
+                                    System.out.println();
+                                }
+
+                                @Override
+                                public void onOpen(@NonNull SupportSQLiteDatabase db) {
+                                    super.onOpen(db);
+                                    System.out.println();
+                                }
+                            })
                             .build();
                 }
             }
