@@ -27,7 +27,7 @@ import group.tonight.roommigrationdemo.model.Word;
                 Word.class
                 , Dog.class
         }
-        , version = 4
+        , version = 5
 )
 public abstract class AppDatabase extends RoomDatabase {
     public abstract WordDao wordDao();
@@ -44,6 +44,7 @@ public abstract class AppDatabase extends RoomDatabase {
                             .addMigrations(MIGRATION_1_2)
                             .addMigrations(MIGRATION_2_3)
                             .addMigrations(MIGRATION_3_4)
+                            .addMigrations(MIGRATION_4_5)
                             .build();
                 }
             }
@@ -74,9 +75,19 @@ public abstract class AppDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             String sql1 = RoomMigrationSqlHelper.addIntegerColumn(Dog.class, "age");
             String sql2 = RoomMigrationSqlHelper.addTextColumn(Dog.class, "address");
-
             database.execSQL(sql1);
             database.execSQL(sql2);
+        }
+    };
+
+    private static Migration MIGRATION_4_5 = new Migration(4,5) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            String createSql = "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `address` TEXT)";
+            String[] sqlArr = RoomMigrationSqlHelper.deleteTableColumn(Dog.class, createSql);
+            for (String sql : sqlArr) {
+                database.execSQL(sql);
+            }
         }
     };
 }
