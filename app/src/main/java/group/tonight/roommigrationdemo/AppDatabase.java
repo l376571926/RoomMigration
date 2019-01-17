@@ -1,11 +1,18 @@
 package group.tonight.roommigrationdemo;
 
+import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
+import group.tonight.roommigrationdemo.dao.CatDao;
+import group.tonight.roommigrationdemo.dao.DogDao;
 import group.tonight.roommigrationdemo.dao.WordDao;
+import group.tonight.roommigrationdemo.model.Cat;
+import group.tonight.roommigrationdemo.model.Dog;
 import group.tonight.roommigrationdemo.model.Word;
 
 /**
@@ -19,11 +26,17 @@ import group.tonight.roommigrationdemo.model.Word;
 @Database(
         entities = {
                 Word.class
+                , Dog.class
+                , Cat.class
         }
-        , version = 1
+        , version = 2
 )
 public abstract class AppDatabase extends RoomDatabase {
     public abstract WordDao wordDao();
+
+    public abstract DogDao dogDao();
+
+    public abstract CatDao catDao();
 
     private static volatile AppDatabase INSTANCE;
 
@@ -32,10 +45,22 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "app_database")
+                            .addMigrations(MIGRATION_1_2)
                             .build();
                 }
             }
         }
         return INSTANCE;
     }
+
+    private static Migration MIGRATION_1_2 = new Migration(1, 2) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            String createSqlOfDog = "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)";
+            database.execSQL(RoomMigrationSqlHelper.addTable(Dog.class, createSqlOfDog));
+
+            String createSqlOfCat = "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)";
+            database.execSQL(RoomMigrationSqlHelper.addTable(Cat.class, createSqlOfCat));
+        }
+    };
 }
