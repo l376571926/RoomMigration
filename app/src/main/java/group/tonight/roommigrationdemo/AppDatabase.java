@@ -27,6 +27,10 @@ import group.tonight.roommigrationdemo.model.Word;
                 Word.class
                 , Dog.class
         }
+        //如果表结构改了（删除、添加表，删除添加表字段），未修改version，会抛这个异常
+        //java.lang.IllegalStateException: Room cannot verify the data integrity.
+        // Looks like you've changed schema but forgot to update the version number.
+        // You can simply fix this by increasing the version number.
         , version = 5
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -41,6 +45,12 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "app_database")
+                            /*
+                             * 删除Cat表中的所有数据
+                             * java.lang.IllegalStateException: A migration from 1 to 2 was required but not found.
+                             * Please provide the necessary Migration path via RoomDatabase.Builder.addMigration(Migration ...)
+                             * or allow for destructive migrations via one of the RoomDatabase.Builder.fallbackToDestructiveMigration* methods.
+                             */
                             .addMigrations(MIGRATION_1_2)
                             .addMigrations(MIGRATION_2_3)
                             .addMigrations(MIGRATION_3_4)
@@ -52,6 +62,9 @@ public abstract class AppDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+    /**
+     * 添加表
+     */
     private static Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -63,6 +76,9 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    /**
+     * 删除表
+     */
     private static Migration MIGRATION_2_3 = new Migration(2, 3) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -70,6 +86,9 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    /**
+     * 添加列
+     */
     private static Migration MIGRATION_3_4 = new Migration(3,4) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -80,6 +99,9 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    /**
+     * 删除列
+     */
     private static Migration MIGRATION_4_5 = new Migration(4,5) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
