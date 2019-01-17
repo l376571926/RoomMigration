@@ -8,7 +8,6 @@ import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import group.tonight.roommigrationdemo.dao.CatDao;
 import group.tonight.roommigrationdemo.dao.DogDao;
 import group.tonight.roommigrationdemo.dao.WordDao;
 import group.tonight.roommigrationdemo.model.Cat;
@@ -27,16 +26,13 @@ import group.tonight.roommigrationdemo.model.Word;
         entities = {
                 Word.class
                 , Dog.class
-                , Cat.class
         }
-        , version = 2
+        , version = 3
 )
 public abstract class AppDatabase extends RoomDatabase {
     public abstract WordDao wordDao();
 
     public abstract DogDao dogDao();
-
-    public abstract CatDao catDao();
 
     private static volatile AppDatabase INSTANCE;
 
@@ -46,6 +42,7 @@ public abstract class AppDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppDatabase.class, "app_database")
                             .addMigrations(MIGRATION_1_2)
+                            .addMigrations(MIGRATION_2_3)
                             .build();
                 }
             }
@@ -61,6 +58,13 @@ public abstract class AppDatabase extends RoomDatabase {
 
             String createSqlOfCat = "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT)";
             database.execSQL(RoomMigrationSqlHelper.addTable(Cat.class, createSqlOfCat));
+        }
+    };
+
+    private static Migration MIGRATION_2_3 = new Migration(2, 3) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL(RoomMigrationSqlHelper.deleteTable(Cat.class));
         }
     };
 }

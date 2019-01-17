@@ -21,7 +21,6 @@ import java.util.List;
 
 import group.tonight.firimsdk.SampleUpdateDialog;
 import group.tonight.roommigrationdemo.databinding.ActivityMainBinding;
-import group.tonight.roommigrationdemo.model.Cat;
 import group.tonight.roommigrationdemo.model.Dog;
 import group.tonight.roommigrationdemo.model.Word;
 
@@ -68,10 +67,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Dog dog = new Dog();
                         dog.setName("dog:" + ((int) (Math.random() * 10000)));
                         AppDatabase.getDatabase(MainActivity.this).dogDao().insert(dog);
-
-                        Cat cat = new Cat();
-                        cat.setName("cat:" + ((int) (Math.random() * 10000)));
-                        AppDatabase.getDatabase(MainActivity.this).catDao().insert(cat);
                     }
                 }).start();
                 break;
