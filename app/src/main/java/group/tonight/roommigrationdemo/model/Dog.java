@@ -11,7 +11,6 @@ public class Dog implements Serializable {
     private int id;
     private String name;
 
-    private int age;
     private String address;
 
     public int getId() {
@@ -28,14 +27,6 @@ public class Dog implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
     public String getAddress() {
